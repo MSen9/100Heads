@@ -1,5 +1,12 @@
+//baseline vars
+const tetCountObj = document.getElementById('tet-count');
+var chips = 0;
+var coinSpeedMultiplier = 1;
+var flipChipGainMultiplier = 1;
+
 //maps between html item names and their 
 const coinMap = new Map();
+
 const baseCoinVals = {
     coinName: "coin0",
     canFlip: true,
@@ -10,8 +17,12 @@ const baseCoinVals = {
     tailStreakMax: 0,
     tetMultiplier: 1
 }
-const tetCountObj = document.getElementById('tet-count');
-var tetras = 0;
+
+const coinUpgradeMap = new Map();
+InitializeCoinUpgrades();
+
+
+
 
 function addCoin(coinType){
     let coinCount = coinMap.size;
@@ -81,33 +92,48 @@ function toss(coinName) {
       flipResult = 1;
     }
     setTimeout(() => (tossResult(coinName,coinVals,flipResult)),3000)
-  }
+}
 
-  function tossResult(coinName, coinVals, flipResult){
-    coinVals.flipSide = flipResult;
-    coinVals.canFlip = true;
-    if(flipResult == 0){
-        coinVals.tailStreak = 0;
-        coinVals.headStreak++;
-        coinVals.headStreakMax = Math.max(coinVals.headStreak,coinVals.headStreakMax);
-        let tetGain = coinVals.headStreak * coinVals.tetMultiplier;
-        gainTets(tetGain);
-    } else {
-        coinVals.headStreak = 0;
-        coinVals.tailStreak++;
-        coinVals.tailStreakMax = Math.max(coinVals.tailStreak,coinVals.tailStreakMax);
-    }
-    updateCoinText(coinVals);
+function tossResult(coinName, coinVals, flipResult){
+  coinVals.flipSide = flipResult;
+  coinVals.canFlip = true;
+  if(flipResult == 0){
+      coinVals.tailStreak = 0;
+      coinVals.headStreak++;
+      coinVals.headStreakMax = Math.max(coinVals.headStreak,coinVals.headStreakMax);
+      let tetGain = coinVals.headStreak * coinVals.tetMultiplier;
+      gainTets(tetGain);
+  } else {
+      coinVals.headStreak = 0;
+      coinVals.tailStreak++;
+      coinVals.tailStreakMax = Math.max(coinVals.tailStreak,coinVals.tailStreakMax);
   }
-  function gainTets(tetCount){
-      tetras += tetCount;
-      $('#tet-count').text(tetras);
-  }
-  function updateCoinText(coinVals){
-    $('#'+coinVals.coinName+'-head-streak').text(coinVals.headStreak);
-    $('#'+coinVals.coinName+'-head-streak-max').text(coinVals.headStreakMax);
-    $('#'+coinVals.coinName+'-tail-streak').text(coinVals.tailStreak);
-    $('#'+coinVals.coinName+'-tail-streak-max').text(coinVals.tailStreakMax);
-  }
+  updateCoinText(coinVals);
+}
+function gainTets(tetCount){
+    chips += tetCount;
+    $('#tet-count').text(chips);
+}
+function updateCoinText(coinVals){
+  $('#'+coinVals.coinName+'-head-streak').text(coinVals.headStreak);
+  $('#'+coinVals.coinName+'-head-streak-max').text(coinVals.headStreakMax);
+  $('#'+coinVals.coinName+'-tail-streak').text(coinVals.tailStreak);
+  $('#'+coinVals.coinName+'-tail-streak-max').text(coinVals.tailStreakMax);
+}
+function AddUpgrade(upgradeName){
+
+}
+function buyUpgrade(upgradeName){
+  
+}
+
+
+//upgrade list
+function InitializeCoinUpgrades(){
+
+}
+function speedDouble(){
+  console.log("test");
+}
 
   
