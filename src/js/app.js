@@ -1,16 +1,19 @@
-//baseline vars
+
+//#region Initialize Values
 const tetCountObj = document.getElementById('tet-count');
 var chips = 0;
 var totalFlips = 0;
 var flipSpeedMultiplier = 1;
 var flipChipGainMultiplier = 1;
 var coinUpgradesShown = false;
+const FLIPS_FOR_UPGRADES = 1;
 //takes 3 seconds to flip a coin by default
 const BASE_FLIP_RATE = 3000;
 
-//maps between html item names and their 
-const coinMap = new Map();
 
+
+//maps between html item names and their values
+const coinMap = new Map();
 const baseCoinVals = {
     coinName: "coin0",
     canFlip: true,
@@ -22,15 +25,33 @@ const baseCoinVals = {
     tetMultiplier: 1
 }
 
-const coinUpgradeMap = new Map();
-const activeCoinUpgrades = [];
+
 
 InitializeGame();
 
+//#endregion
+
+//#region General util functions
+
+function GainChips(chipCount){
+  chips += chipCount;
+  $('#chip-count').text(chips);
+}
+function LoseChips(chipCount){
+  chips -= chipCount;
+  $('#chip-count').text(chips);
+  CheckUpgrades();
+}
+
+//#endregion
 function InitializeGame(){
-  InitializeCoinUpgrades();
+  $.getScript("src/js/coinUpgrades.js", function (){
+    InitializeCoinUpgrades();
+    NewGame();
+  });
+  
   //check for save data, for now just go with default
-  NewGame();
+  
 }
 
 function NewGame(){
@@ -44,29 +65,17 @@ window.setInterval( function() {
   CheckProgress();
 }, 1000);
 
-//check to see if you can buy upgrades
-function CheckUpgrades(){
-  for(const upgradeObj of activeCoinUpgrades){
-    if(upgradeObj.chipCost > chips){
-      $('#Upgrade' + upgradeObj.id+'Button').prop('disabled', true);
-    } else {
-      $('#Upgrade' + upgradeObj.id+'Button').prop('disabled', false);
-    }
-  }
-}
+
 
 function CheckProgress(){
   if(coinUpgradesShown == false){
-    if(totalFlips >= 5){
+    if(totalFlips >= FLIPS_FOR_UPGRADES){
       ShowCoinUpgrades();
     }
   }
 }
-function ShowCoinUpgrades(){
-  var element = $('#CoinUpgrades');
-  element[0].classList.remove("d-none");
-  coinUpgradesShown = true;
-}
+
+//#region Coins/CoinFlipping
 function AddCoin(coinType){
     let coinCount = coinMap.size;
     let coinName = "coin" + coinCount;
@@ -154,15 +163,7 @@ function TossResult(coinName, coinVals, flipResult){
   }
   UpdateCoinText(coinVals);
 }
-function GainChips(chipCount){
-    chips += chipCount;
-    $('#chip-count').text(chips);
-}
-function LoseChips(chipCount){
-    chips += chipCount;
-    $('#chip-count').text(chips);
-    CheckUpgrades();
-}
+
 
 function UpdateCoinText(coinVals){
   $('#'+coinVals.coinName+'-head-streak').text(coinVals.headStreak);
@@ -175,47 +176,7 @@ function GetFlipSpeed(){
   return BASE_FLIP_RATE/flipSpeedMultiplier;
 }
 
-
-function AddUpgrade(upgradeName){
-  let upgradeObj = coinUpgradeMap.get(upgradeName);
-  let coinCostString = "";
-  if(upgradeObj.chipCost != 0){
-    coinCostString = upgradeObj.chipCost + "Ch: ";
-  }
-  $('#CoinUpgrades').append(`
-  <div class="row" id="Upgrade`+upgradeObj.id + `">
-    <div class="col-9">
-      <h6>`+upgradeObj.title +`</h6>
-      ` + coinCostString + upgradeObj.desc + `
-    </div>
-    <div class="col-3">
-      <button id="Upgrade`+upgradeObj.id + `Button" class ="btn btn-dark" disabled onclick="BuyUpgrade('`+upgradeName + `')">Buy</button>
-    </div>
-  </div>
-   `);
-   activeCoinUpgrades.push(upgradeObj);
-}
-
-function BuyUpgrade(upgradeName){
-  let upgrade = coinUpgradeMap.get(upgradeName);
-  console.log(upgrade);
-  LoseChips(upgrade.chipCost);
-  upgrade.func();
-  $("#Upgrade"+upgrade.id).remove();
-  activeCoinUpgrades.splice(activeCoinUpgrades.indexOf(upgrade));
-}
-
-function MultiplyFlipSpeed(factor){
-  flipSpeedMultiplier *= factor;
-}
-//upgrade list
-function InitializeCoinUpgrades(){
-  coinUpgradeMap.set("FlipSpeed1",{id: 0, func: FlipSpeed1, chipCost: 1, title: "Improved Technique",desc: "Increase flip speed by 50%"});
-}
-
-function FlipSpeed1(){
-  MultiplyFlipSpeed(1.5);
-}
+//#endregion
 
 
   
